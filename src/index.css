@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Prevent scrolling */
+}
+
+.app-container {
+  /* Flex layout handled by Tailwind classes in App.tsx */
+}
+
+/* Location Arrow Marker */
+.location-arrow {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 0.3s ease-out;
+  position: relative;
+}
+
+.location-arrow::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 12px solid white;
+}
+
+/* Current Location Button - Additional styles beyond Tailwind */
+.current-location-button {
+  backdrop-filter: blur(10px);
+  /* PC default position */
+  bottom: 24px;
+  right: 20px;
+  z-index: 1100;
+  /* Above layer menu container (1000) */
+  transition: transform 0.3s ease-out, bottom 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+/* Mobile: Position above the collapsed bottom sheet (55px visible height) */
+@media (max-width: 768px) {
+  .current-location-button {
+    /* 55px (sheet height) + 16px (spacing) + safe area */
+    bottom: calc(55px + 16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Raised state for mobile - lift up slightly more */
+  .current-location-button--raised {
+    transform: translateY(-10px);
+  }
+}
+
+.current-location-button:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Raised state - general */
+.current-location-button--raised {
+  /* For PC, maybe just lift slightly or keep same */
+  transform: translateY(-10px);
+}
+
+/* Hover effect - additional lift */
+.current-location-button:hover {
+  transform: translateY(-12px);
+  /* Combine with raised state */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Layer Menu Enhancements */
+.layer-menu-container {
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 768px) {
+  .layer-menu-container {
+    border-radius: 0;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.layer-menu-handle-bar {
+  transition: background-color 0.2s ease;
+}
+
+.layer-menu-container:hover .layer-menu-handle-bar {
+  background-color: #9ca3af;
+}
