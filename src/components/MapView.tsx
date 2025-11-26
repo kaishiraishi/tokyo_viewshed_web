@@ -3,6 +3,10 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { SelectedViewpoint } from '../types/map';
 
+// ▼▼▼ ここをあなたのR2のURL（https://pub-....r2.dev）に書き換えてください ▼▼▼
+const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev'; 
+// ▲▲▲ 末尾にスラッシュ(/)は不要です ▲▲▲
+
 interface MapViewProps {
     selectedViewpoint: SelectedViewpoint;
     layerOpacity: number;
@@ -35,30 +39,32 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
                         tileSize: 256,
                         attribution: '&copy; OpenStreetMap Contributors',
                     },
+                    // ▼▼▼ ここからR2を参照するように変更しました ▼▼▼
                     tokyotower: {
                         type: 'raster',
-                        tiles: ['/viewshed_tokyotower_inf_3857_rgba_tiles/{z}/{x}/{y}.png'],
+                        tiles: [`${R2_BASE_URL}/viewshed_tokyotower_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
                         attribution: 'Tokyo Tower Data',
                     },
                     skytree: {
                         type: 'raster',
-                        tiles: ['/viewshed_skytree_inf_3857_rgba_tiles/{z}/{x}/{y}.png'],
+                        tiles: [`${R2_BASE_URL}/viewshed_skytree_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
                         attribution: 'Tokyo Skytree Data'
                     },
                     docomo: {
                         type: 'raster',
-                        tiles: ['/viewshed_docomo_inf_3857_rgba_tiles/{z}/{x}/{y}.png'],
+                        tiles: [`${R2_BASE_URL}/viewshed_docomo_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
                         attribution: 'Docomo Tower Data'
                     },
                     tocho: {
                         type: 'raster',
-                        tiles: ['/viewshed_tocho_inf_3857_rgba_tiles/{z}/{x}/{y}.png'],
+                        tiles: [`${R2_BASE_URL}/viewshed_tocho_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
                         attribution: 'Tocho Data'
                     }
+                    // ▲▲▲ 変更ここまで ▲▲▲
                 },
                 layers: [
                     {
@@ -129,10 +135,6 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
     useEffect(() => {
         if (!map.current) return;
         const mapInstance = map.current;
-
-        // Wait for style to load if needed, but simple raster layers usually work immediately if source is added.
-        // Better to check if style is loaded or use 'styledata' event if complex.
-        // For now, we assume map is ready or we check style.getLayer.
 
         const layers = [
             { id: 'tokyotower-layer', viewpoint: 'tokyoTower' },

@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# Tokyo Viewshed Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+東京の主要な建造物からの視界可視領域（Viewshed）を表示するWebアプリケーション。
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 4つの視点からのViewshedレイヤー:
+  - Tokyo Tower (東京タワー)
+  - Tokyo Skytree (東京スカイツリー)
+  - Docomo Tower (ドコモタワー)
+  - Tocho (都庁)
+- レイヤーの透明度調整
+- 現在地表示
+- レスポンシブデザイン（PC/モバイル対応）
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React + TypeScript
+- Vite
+- MapLibre GL JS
+- Tailwind CSS
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Install dependencies
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Start dev server
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## GitHub Pages Deployment
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+タイルデータは約5.5GBあるため、GitHubリポジトリには含まれていません。
+デプロイ前に、以下のいずれかの方法でタイルデータをホストする必要があります:
+
+#### Option 1: Cloudflare R2 (推奨)
+1. [Cloudflare R2](https://www.cloudflare.com/products/r2/)でバケットを作成
+2. 以下のタイルディレクトリをアップロード:
+   - `public/viewshed_docomo_inf_3857_rgba_tiles/`
+   - `public/viewshed_skytree_inf_3857_rgba_tiles/`
+   - `public/viewshed_tocho_inf_3857_rgba_tiles/`
+   - `public/viewshed_tokyotower_inf_3857_rgba_tiles/`
+3. `src/components/MapView.tsx`のタイルURLを更新
+
+#### Option 2: AWS S3 + CloudFront
+1. S3バケットを作成し、タイルをアップロード
+2. CloudFrontディストリビューションを設定
+3. `src/components/MapView.tsx`のタイルURLを更新
+
+### Deploy Steps
+
+1. GitHubで新規リポジトリを作成: https://github.com/new
+   - Repository name: `tokyo_viewshed_web`
+   - Visibility: **Public** (GitHub Pages無料利用のため)
+
+2. コードをプッシュ:
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/tokyo_viewshed_web.git
+git branch -M main
+git push -u origin main
 ```
+
+3. GitHubリポジトリの Settings > Pages で:
+   - Source: GitHub Actions を選択
+   - 自動的に `.github/workflows/deploy.yml` が実行されます
+
+4. デプロイURL: `https://YOUR_USERNAME.github.io/tokyo_viewshed_web/`
+
+## License
+
+MIT
