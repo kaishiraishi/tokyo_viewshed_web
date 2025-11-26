@@ -10,11 +10,14 @@ interface LayerMenuProps {
     onClose: () => void;
 }
 
+// ▼ Cloudflare R2 base URL (same as used in MapView.tsx)
+const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev';
+
 const VIEWPOINT_CARDS: { id: SelectedViewpoint; label: string; imageUrl?: string }[] = [
-    { id: 'tokyoTower', label: 'Tokyo Tower', imageUrl: `${import.meta.env.BASE_URL}layer_photo/tokyotower.jpg` },
-    { id: 'skytree', label: 'Tokyo Skytree', imageUrl: `${import.meta.env.BASE_URL}layer_photo/tokyoskytree.webp` },
-    { id: 'docomo', label: 'Docomo Tower', imageUrl: `${import.meta.env.BASE_URL}layer_photo/docomotower.jpg` },
-    { id: 'tocho', label: 'Tocho', imageUrl: `${import.meta.env.BASE_URL}layer_photo/tocho.jpg` },
+    { id: 'tokyoTower', label: 'Tokyo Tower', imageUrl: `${R2_BASE_URL}/layer_photo/tokyotower.jpg` },
+    { id: 'skytree', label: 'Tokyo Skytree', imageUrl: `${R2_BASE_URL}/layer_photo/tokyoskytree.webp` },
+    { id: 'docomo', label: 'Docomo Tower', imageUrl: `${R2_BASE_URL}/layer_photo/docomotower.jpg` },
+    { id: 'tocho', label: 'Tocho', imageUrl: `${R2_BASE_URL}/layer_photo/tocho.jpg` },
     { id: 'none', label: 'None' },
 ];
 
