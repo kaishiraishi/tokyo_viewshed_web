@@ -108,3 +108,36 @@ body,
 .layer-menu-container:hover .layer-menu-handle-bar {
   background-color: #9ca3af;
 }
+
+/* 著作権表示（Attribution）をGoogle Maps風に小さくする */
+.maplibregl-ctrl-attrib {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  /* 背景を半透明に */
+  font-size: 10px !important;
+  /* 文字を極小に (Google風) */
+  line-height: 12px !important;
+  /* 行間を詰める */
+  padding: 2px 6px !important;
+  /* 余白を削る */
+  margin: 0 !important;
+  /* 外側の余白をなくす */
+  box-shadow: none !important;
+  /* 影を消す */
+  border-radius: 0 !important;
+  /* 角丸をなくす（帯っぽくするなら） */
+}
+
+/* リンク文字の色も控えめにする */
+.maplibregl-ctrl-attrib a {
+  color: #444 !important;
+  text-decoration: none !important;
+}
+
+/* 右下のコントロールコンテナ自体の余白を消して、画面端にピタッとくっつける */
+.maplibregl-ctrl-bottom-right {
+  bottom: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  /* スマホで文字が折り返されすぎないように */
+}

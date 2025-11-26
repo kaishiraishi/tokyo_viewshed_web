@@ -5,8 +5,10 @@ import { useMapViewState } from './hooks/useMapViewState';
 
 function App() {
   const {
-    selectedViewpoint,
-    setSelectedViewpoint,
+    selectedViewpoints,
+    toggleViewpoint,
+    isMultiSelectMode,
+    toggleMultiSelectMode,
     layerOpacity,
     setLayerOpacity,
     isLayerMenuOpen,
@@ -19,32 +21,30 @@ function App() {
 
   return (
     <div className="app-container flex flex-col md:flex-row h-screen w-screen overflow-hidden">
-      {/* Side Menu for PC / Bottom Sheet for Mobile */}
       <LayerMenu
-        selectedViewpoint={selectedViewpoint}
+        selectedViewpoints={selectedViewpoints}
         layerOpacity={layerOpacity}
-        onSelectViewpoint={setSelectedViewpoint}
+        onToggleViewpoint={toggleViewpoint}
         onChangeOpacity={setLayerOpacity}
         isOpen={isLayerMenuOpen}
         onOpen={openLayerMenu}
         onClose={closeLayerMenu}
+        isMultiSelectMode={isMultiSelectMode}
+        onToggleMultiSelectMode={toggleMultiSelectMode}
       />
 
-      {/* Map Area */}
       <div className="flex-1 relative h-full">
         <MapView
-          selectedViewpoint={selectedViewpoint}
+          selectedViewpoints={selectedViewpoints}
           layerOpacity={layerOpacity}
           center={currentLocation}
           heading={heading}
         />
 
-        {/* Current Location FAB - only show when menu is closed */}
         {!isLayerMenuOpen && (
           <CurrentLocationButton onClick={locateMe} />
         )}
 
-        {/* Floating Action Button for Mobile to open menu if closed */}
         {!isLayerMenuOpen && (
           <button
             className="md:hidden absolute bottom-6 right-6 z-10 bg-white p-3 rounded-full shadow-lg"

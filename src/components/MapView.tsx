@@ -4,21 +4,22 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import type { SelectedViewpoint } from '../types/map';
 
 // ▼▼▼ ここをあなたのR2のURL（https://pub-....r2.dev）に書き換えてください ▼▼▼
-const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev'; 
+const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev';
 // ▲▲▲ 末尾にスラッシュ(/)は不要です ▲▲▲
 
 interface MapViewProps {
-    selectedViewpoint: SelectedViewpoint;
+    // 【変更】配列を受け取る
+    selectedViewpoints: SelectedViewpoint[];
     layerOpacity: number;
     center: { lng: number; lat: number } | null;
     heading: number | null;
 }
 
-export default function MapView({ selectedViewpoint, layerOpacity, center, heading }: MapViewProps) {
+export default function MapView({ selectedViewpoints, layerOpacity, center, heading }: MapViewProps) {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<maplibregl.Map | null>(null);
     const marker = useRef<maplibregl.Marker | null>(null);
-    
+
     // 【追加】地図の読み込み完了を管理するステート
     const [isMapLoaded, setIsMapLoaded] = useState(false);
 
@@ -47,25 +48,21 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
                         type: 'raster',
                         tiles: [`${R2_BASE_URL}/viewshed_tokyotower_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
-                        attribution: 'Tokyo Tower Data',
                     },
                     skytree: {
                         type: 'raster',
                         tiles: [`${R2_BASE_URL}/viewshed_skytree_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
-                        attribution: 'Tokyo Skytree Data'
                     },
                     docomo: {
                         type: 'raster',
                         tiles: [`${R2_BASE_URL}/viewshed_docomo_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
-                        attribution: 'Docomo Tower Data'
                     },
                     tocho: {
                         type: 'raster',
                         tiles: [`${R2_BASE_URL}/viewshed_tocho_inf_3857_rgba_tiles/{z}/{x}/{y}.png`],
                         tileSize: 256,
-                        attribution: 'Tocho Data'
                     }
                     // ▲▲▲ 変更ここまで ▲▲▲
                 },
@@ -123,9 +120,14 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
             },
             center: [139.7454, 35.6586], // Tokyo Tower
             zoom: 13,
+            attributionControl: false, // デフォルトの表示は消す（手動で追加するため）
         });
 
         map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+        // 左上(top-left)ではなく「右下(bottom-right)」にします。
+        // compact: false にすることで、「i」アイコンではなく最初から文字を表示させます。
+        map.current.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-right');
 
         // 【追加】地図のスタイル読み込み完了イベントを検知してフラグを立てる
         map.current.on('load', () => {
@@ -140,11 +142,9 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
         };
     }, []);
 
-    // Update Viewpoint and Opacity
+    // Update Viewpoints and Opacity (ここを修正)
     useEffect(() => {
-        // isMapLoaded が false の間は待機（ロード完了後および依存項目変更時に実行）
         if (!map.current || !isMapLoaded) return;
-        
         const mapInstance = map.current;
 
         const layers = [
@@ -156,7 +156,10 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
 
         layers.forEach(layer => {
             if (mapInstance.getLayer(layer.id)) {
-                const isSelected = selectedViewpoint === layer.viewpoint;
+                // 【変更】配列に含まれているかどうかで判定
+                // 型チェックを避けるため any キャスト
+                const isSelected = (selectedViewpoints as any).includes(layer.viewpoint);
+
                 const opacity = isSelected ? layerOpacity : 0;
                 const visibility = isSelected ? 'visible' : 'none';
 
@@ -165,7 +168,7 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
             }
         });
 
-    }, [selectedViewpoint, layerOpacity, isMapLoaded]); // 【修正】isMapLoaded を依存配列に追加
+    }, [selectedViewpoints, layerOpacity, isMapLoaded]); // 【変更】依存配列も修正
 
     // Update Center (Geolocation)
     useEffect(() => {
