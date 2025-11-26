@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { SelectedViewpoint } from '../types/map';
@@ -18,6 +18,9 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<maplibregl.Map | null>(null);
     const marker = useRef<maplibregl.Marker | null>(null);
+    
+    // 【追加】地図の読み込み完了を管理するステート
+    const [isMapLoaded, setIsMapLoaded] = useState(false);
 
     // Initialize Map
     useEffect(() => {
@@ -124,16 +127,24 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
 
         map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
 
+        // 【追加】地図のスタイル読み込み完了イベントを検知してフラグを立てる
+        map.current.on('load', () => {
+            setIsMapLoaded(true);
+        });
+
         // Cleanup
         return () => {
             map.current?.remove();
             map.current = null;
+            setIsMapLoaded(false);
         };
     }, []);
 
     // Update Viewpoint and Opacity
     useEffect(() => {
-        if (!map.current) return;
+        // isMapLoaded が false の間は待機（ロード完了後および依存項目変更時に実行）
+        if (!map.current || !isMapLoaded) return;
+        
         const mapInstance = map.current;
 
         const layers = [
@@ -154,7 +165,7 @@ export default function MapView({ selectedViewpoint, layerOpacity, center, headi
             }
         });
 
-    }, [selectedViewpoint, layerOpacity]);
+    }, [selectedViewpoint, layerOpacity, isMapLoaded]); // 【修正】isMapLoaded を依存配列に追加
 
     // Update Center (Geolocation)
     useEffect(() => {
