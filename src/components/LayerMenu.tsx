@@ -13,12 +13,36 @@ interface LayerMenuProps {
 // ▼ Cloudflare R2 base URL (same as used in MapView.tsx)
 const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev';
 
-const VIEWPOINT_CARDS: { id: SelectedViewpoint; label: string; imageUrl?: string }[] = [
-    { id: 'tokyoTower', label: 'Tokyo Tower', imageUrl: `${R2_BASE_URL}/layer_photo/tokyotower.jpg` },
-    { id: 'skytree', label: 'Tokyo Skytree', imageUrl: `${R2_BASE_URL}/layer_photo/tokyoskytree.webp` },
-    { id: 'docomo', label: 'Docomo Tower', imageUrl: `${R2_BASE_URL}/layer_photo/docomotower.jpg` },
-    { id: 'tocho', label: 'Tocho', imageUrl: `${R2_BASE_URL}/layer_photo/tocho.jpg` },
-    { id: 'none', label: 'None' },
+const VIEWPOINT_CARDS: { id: SelectedViewpoint; label: string; imageUrl?: string; subtitle?: string }[] = [
+    { 
+        id: 'tokyoTower', 
+        label: '東京タワー', 
+        imageUrl: `${R2_BASE_URL}/layer_photo/tokyotower.jpg`,
+        subtitle: '港区 / 333m'
+    },
+    { 
+        id: 'skytree', 
+        label: '東京スカイツリー', 
+        imageUrl: `${R2_BASE_URL}/layer_photo/tokyoskytree.webp`,
+        subtitle: '墨田区 / 634m'
+    },
+    { 
+        id: 'docomo', 
+        label: 'ドコモタワー', 
+        imageUrl: `${R2_BASE_URL}/layer_photo/docomotower.jpg`,
+        subtitle: '渋谷区 / 240m'
+    },
+    { 
+        id: 'tocho', 
+        label: '都庁', 
+        imageUrl: `${R2_BASE_URL}/layer_photo/tocho.jpg`,
+        subtitle: '新宿区 / 243m'
+    },
+    { 
+        id: 'none', 
+        label: 'なし',
+        subtitle: '-' 
+    },
 ];
 
 export default function LayerMenu({
@@ -93,9 +117,12 @@ export default function LayerMenu({
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                                         {/* Label */}
-                                        <span className="absolute bottom-2 right-2 text-xs font-medium text-white drop-shadow-md">
-                                            {card.label}
-                                        </span>
+                                        <div className="absolute bottom-2 right-2 text-right text-white drop-shadow-md">
+                                            <div className="text-xs font-medium">{card.label}</div>
+                                            {card.subtitle && (
+                                                <div className="text-[10px] opacity-80">{card.subtitle}</div>
+                                            )}
+                                        </div>
 
                                         {/* Active Indicator (Optional checkmark) */}
                                         {isActive && (
