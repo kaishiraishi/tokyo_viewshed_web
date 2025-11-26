@@ -11,10 +11,10 @@ interface LayerMenuProps {
 }
 
 const VIEWPOINT_CARDS: { id: SelectedViewpoint; label: string; imageUrl?: string }[] = [
-    { id: 'tokyoTower', label: 'Tokyo Tower', imageUrl: '/layer_photo/tokyotower.jpg' },
-    { id: 'skytree', label: 'Tokyo Skytree', imageUrl: '/layer_photo/tokyoskytree.webp' },
-    { id: 'docomo', label: 'Docomo Tower', imageUrl: '/layer_photo/docomotower.jpg' },
-    { id: 'tocho', label: 'Tocho', imageUrl: '/layer_photo/tocho.jpg' },
+    { id: 'tokyoTower', label: 'Tokyo Tower', imageUrl: `${import.meta.env.BASE_URL}layer_photo/tokyotower.jpg` },
+    { id: 'skytree', label: 'Tokyo Skytree', imageUrl: `${import.meta.env.BASE_URL}layer_photo/tokyoskytree.webp` },
+    { id: 'docomo', label: 'Docomo Tower', imageUrl: `${import.meta.env.BASE_URL}layer_photo/docomotower.jpg` },
+    { id: 'tocho', label: 'Tocho', imageUrl: `${import.meta.env.BASE_URL}layer_photo/tocho.jpg` },
     { id: 'none', label: 'None' },
 ];
 
