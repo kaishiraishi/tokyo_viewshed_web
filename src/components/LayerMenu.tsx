@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import type { SelectedViewpoint } from '../types/map';
 
 const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev';
@@ -10,7 +11,6 @@ interface LayerMenuProps {
     isOpen: boolean;
     onOpen: () => void;
     onClose: () => void;
-    // 複数選択モード
     isMultiSelectMode?: boolean;
     onToggleMultiSelectMode?: () => void;
 }
@@ -33,42 +33,133 @@ export default function LayerMenu({
     isMultiSelectMode = false,
     onToggleMultiSelectMode,
 }: LayerMenuProps) {
+    // ▼▼▼ ドラッグ操作用のRef ▼▼▼
+    const containerRef = useRef<HTMLDivElement>(null);
+    const touchStartY = useRef<number>(0);
+    const isDraggingRef = useRef(false);
+
+    // ハンドルの高さ（閉じたときに見えている部分）
+    const HANDLE_HEIGHT = 55;
+
+    // ポインター（マウス・タッチ）開始
+    const handlePointerDown = (e: React.PointerEvent) => {
+        // スクロール等を防ぐ（タッチデバイスで重要）
+        // ただし touch-action: none がCSSにあれば基本不要だが念のため
+        // e.preventDefault(); // ReactのPointerEventで呼ぶと警告が出る場合があるが、touch-actionで制御するのが基本
+
+        e.currentTarget.setPointerCapture(e.pointerId);
+        touchStartY.current = e.clientY;
+        isDraggingRef.current = true;
+
+        // 即座にtransitionを無効化して追従性を高める
+        if (containerRef.current) {
+            containerRef.current.style.transition = 'none';
+        }
+    };
+
+    // ポインター移動
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (!isDraggingRef.current) return;
+        if (!containerRef.current) return;
+
+        const currentY = e.clientY;
+        const diff = currentY - touchStartY.current;
+
+        // メニュー全体の高さ
+        const menuHeight = containerRef.current.offsetHeight;
+        const closedOffset = menuHeight - HANDLE_HEIGHT;
+
+        let newTranslateY = 0;
+
+        if (isOpen) {
+            // Open時: 0px から下(プラス)へ動く
+            newTranslateY = Math.max(0, diff);
+        } else {
+            // Closed時: closedOffset から上(マイナス)へ動く
+            // diffはマイナスになるはず
+            newTranslateY = Math.max(0, closedOffset + diff);
+        }
+
+        containerRef.current.style.transform = `translateY(${newTranslateY}px)`;
+    };
+
+    // ポインター終了
+    const handlePointerUp = (e: React.PointerEvent) => {
+        if (!isDraggingRef.current) return;
+        isDraggingRef.current = false;
+        e.currentTarget.releasePointerCapture(e.pointerId);
+
+        if (!containerRef.current) return;
+
+        // インラインスタイルを削除してCSSクラスの制御に戻す
+        containerRef.current.style.transform = '';
+        containerRef.current.style.transition = '';
+
+        const endY = e.clientY;
+        const diff = endY - touchStartY.current;
+        const THRESHOLD = 50; // 50px以上動かしたら反応
+
+        if (Math.abs(diff) < 5) {
+            // 移動がほぼない場合はクリック（タップ）とみなしてトグル
+            if (isOpen) onClose();
+            else onOpen();
+            return;
+        }
+
+        if (isOpen) {
+            // 開いている時: 下に大きく動かしたら閉じる
+            if (diff > THRESHOLD) onClose();
+        } else {
+            // 閉じている時: 上に大きく動かしたら開く
+            if (diff < -THRESHOLD) onOpen();
+        }
+    };
+
     return (
         <>
             {/* モバイル用バックドロップ */}
-            {isOpen && <div className="layer-menu-backdrop fixed inset-0 bg-black/30 z-20 md:hidden" onClick={onClose} />}
+            {isOpen && <div className="layer-menu-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" onClick={onClose} />}
 
-            <div className={`layer-menu-container fixed bottom-0 left-0 right-0 bg-white z-30 transition-transform duration-300 ease-in-out md:relative md:transform-none md:w-80 md:h-full md:shadow-lg flex flex-col ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-55px)] md:translate-y-0'}`}>
+            <div
+                ref={containerRef}
+                /* ▼▼▼ 変更: クラス制御 ▼▼▼ */
+                /* transition-none はJSでインライン制御するため、基本クラスには transition-transform を入れておく */
+                className={`layer-menu-container fixed bottom-0 left-0 right-0 bg-black/60 backdrop-blur-md text-white z-30
+                    transition-transform duration-300 ease-in-out
+                    md:relative md:transform-none md:w-80 md:h-full shadow-2xl rounded-t-2xl md:rounded-2xl flex flex-col border border-white/10
+                    ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-55px)] md:translate-y-0'}`
+                }
+            >
 
-                {/* モバイル用ハンドル */}
+                {/* モバイル用ハンドルエリア（ここをドラッグ領域にする） */}
                 <div
-                    className="layer-menu-handle h-[55px] flex items-center justify-center cursor-pointer border-t border-gray-200 md:hidden"
-                    onClick={isOpen ? onClose : onOpen}
+                    className="layer-menu-handle h-[55px] flex items-center justify-center cursor-pointer md:hidden touch-none"
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
                 >
-                    <div className="flex flex-col items-center">
-                        <div className="layer-menu-handle-bar w-10 h-1 bg-gray-300 rounded-full mb-2" />
-                        <span className="layer-menu-handle-label text-sm text-gray-600 font-medium">
-                            {isOpen ? '下に押して閉じる' : 'レイヤー選択'}
-                        </span>
+                    <div className="flex flex-col items-center pointer-events-none">
+                        <div className="layer-menu-handle-bar w-10 h-1 bg-white/30 rounded-full" />
                     </div>
                 </div>
 
                 {/* メインコンテンツ */}
                 <div className="flex-1 overflow-y-auto p-4">
-                    {/* ▼ コントロールエリア（ヘッダー・透明度）をグループ化 ▼ */}
+
                     <div className="mb-6 space-y-6">
                         {/* 1. ヘッダー: ロゴのみ */}
                         <div className="flex items-center justify-start">
                             <img
                                 src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
                                 alt="Privue Logo"
-                                className="h-10 md:h-12 object-contain"
+                                className="h-12 object-contain invert brightness-0"
                             />
                         </div>
 
                         {/* 2. 透明度スライダー */}
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-500 mb-2">透明度</h3> {/* テキスト変更 */}
+                            <h3 className="text-sm font-semibold text-gray-400 mb-2">Layer Opacity</h3>
                             <div className="flex items-center space-x-3">
                                 <input
                                     type="range"
@@ -77,35 +168,35 @@ export default function LayerMenu({
                                     step="0.1"
                                     value={layerOpacity}
                                     onChange={(e) => onChangeOpacity(parseFloat(e.target.value))}
-                                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                                 />
-                                <div className="w-10 text-right text-sm text-gray-500 font-medium">
+                                <div className="w-10 text-right text-sm text-gray-300 font-medium">
                                     {Math.round(layerOpacity * 100)}%
                                 </div>
                             </div>
                         </div>
+                        {/* 3. レイヤー選択セクション */}
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <h3 className="text-sm font-semibold text-gray-400">Select Layer</h3>
+                                {onToggleMultiSelectMode && (
+                                    <button
+                                        onClick={onToggleMultiSelectMode}
+                                        aria-pressed={isMultiSelectMode}
+                                        className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors duration-200 border ${isMultiSelectMode
+                                            ? 'bg-blue-500/30 text-blue-300 border-blue-400/50'
+                                            : 'bg-white/10 text-gray-300 border-white/10 hover:bg-white/20'
+                                            }`}
+                                    >
+                                        複数選択
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* ▼ カードリストヘッダー：選択レイヤー + 複数選択ボタン ▼ */}
-                    <div className="mb-2 flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-gray-500">選択レイヤー</h3>
-                        {onToggleMultiSelectMode && (
-                            <button
-                                onClick={onToggleMultiSelectMode}
-                                aria-pressed={isMultiSelectMode}
-                                className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors duration-200 border ${
-                                    isMultiSelectMode
-                                        ? 'bg-blue-100 text-blue-700 border-blue-200'
-                                        : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
-                                }`}
-                            >
-                                複数選択
-                            </button>
-                        )}
-                    </div>
-
-                    {/* ▼ カードリストエリア ▼ */}
-                    <div className="layer-menu-card-list flex space-x-4 overflow-x-auto pb-4 md:flex-col md:space-x-0 md:space-y-3">
+                    {/* カードリストエリア */}
+                    <div className="layer-menu-card-list flex space-x-4 overflow-x-auto p-4 md:flex-col md:space-x-0 md:space-y-3">
                         {VIEWPOINT_CARDS.map((card) => {
                             const isActive = selectedViewpoints.includes(card.id);
 
@@ -113,25 +204,27 @@ export default function LayerMenu({
                                 <button
                                     key={card.id}
                                     onClick={() => onToggleViewpoint(card.id)}
-                                    className={`relative flex-shrink-0 w-32 aspect-square rounded-xl overflow-hidden border transition-all duration-200 md:w-full md:h-auto md:aspect-video ${
-                                        isActive ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-200 hover:border-gray-300'
-                                    }`}
+                                    className={`relative flex-shrink-0 w-32 aspect-square rounded-xl overflow-hidden transition-all duration-300 md:w-full md:h-auto md:aspect-video shadow-lg hover:shadow-2xl hover:-translate-y-1 group ${isActive ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900' : ''
+                                        }`}
                                 >
                                     {/* 背景画像 */}
                                     {card.imageUrl ? (
                                         <img
                                             src={card.imageUrl}
                                             alt={card.label}
-                                            className="absolute inset-0 w-full h-full object-cover"
+                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                     ) : (
-                                        <div className="absolute inset-0 w-full h-full bg-gray-100 flex items-center justify-center">
+                                        <div className="absolute inset-0 w-full h-full bg-gray-800 flex items-center justify-center">
                                             <span className="text-4xl opacity-20">🚫</span>
                                         </div>
                                     )}
 
+                                    {/* 黒の半透明オーバーレイ */}
+                                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-300" />
+
                                     {/* グラデーションオーバーレイ */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
                                     {/* ラベルテキスト */}
                                     <div className="absolute bottom-2 right-2 text-right text-white drop-shadow-md">
@@ -141,9 +234,9 @@ export default function LayerMenu({
                                         )}
                                     </div>
 
-                                    {/* チェックマーク (常時表示・色変化) */}
+                                    {/* チェックマーク */}
                                     <div
-                                        className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm transition-colors duration-200 ${isActive ? 'bg-blue-500' : 'bg-black/30 border border-white/50'
+                                        className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 ${isActive ? 'bg-blue-500 scale-110' : 'bg-black/40 border border-white/30 backdrop-blur-sm'
                                             }`}
                                     >
                                         <svg

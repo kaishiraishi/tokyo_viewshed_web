@@ -7,7 +7,7 @@ interface CurrentLocationButtonProps {
 export default function CurrentLocationButton({ onClick }: CurrentLocationButtonProps) {
     return (
         <button
-            className="current-location-button absolute bottom-6 right-6 z-10 bg-white p-3 rounded-full shadow-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors md:bottom-8 md:right-8"
+            className="current-location-button absolute bottom-6 right-6 z-10 bg-black/60 backdrop-blur-md border border-white/10 p-3 rounded-full shadow-lg text-white hover:bg-black/70 active:bg-black/80 transition-colors md:bottom-8 md:right-8"
             onClick={onClick}
             aria-label="現在地へ移動"
         >
