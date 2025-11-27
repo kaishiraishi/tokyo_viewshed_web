@@ -39,7 +39,7 @@ export default function LayerMenu({
             {isOpen && <div className="layer-menu-backdrop fixed inset-0 bg-black/30 z-20 md:hidden" onClick={onClose} />}
 
             <div className={`layer-menu-container fixed bottom-0 left-0 right-0 bg-white z-30 transition-transform duration-300 ease-in-out md:relative md:transform-none md:w-80 md:h-full md:shadow-lg flex flex-col ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-55px)] md:translate-y-0'}`}>
-                
+
                 {/* モバイル用ハンドル */}
                 <div
                     className="layer-menu-handle h-[55px] flex items-center justify-center cursor-pointer border-t border-gray-200 md:hidden"
@@ -55,31 +55,20 @@ export default function LayerMenu({
 
                 {/* メインコンテンツ */}
                 <div className="flex-1 overflow-y-auto p-4">
-                    <h2 className="text-lg font-bold mb-6 hidden md:block">Viewshed Layers</h2>
-
                     {/* ▼ コントロールエリア（ヘッダー・透明度）をグループ化 ▼ */}
                     <div className="mb-6 space-y-6">
-                        {/* 1. ヘッダー: ラベルと複数選択ボタン */}
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-gray-500">Select Viewpoint</h3>
-                            {onToggleMultiSelectMode && (
-                                <button
-                                    onClick={onToggleMultiSelectMode}
-                                    aria-pressed={isMultiSelectMode}
-                                    className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors duration-200 border ${
-                                        isMultiSelectMode 
-                                            ? 'bg-blue-100 text-blue-700 border-blue-200' 
-                                            : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
-                                    }`}
-                                >
-                                    複数選択
-                                </button>
-                            )}
+                        {/* 1. ヘッダー: ロゴのみ */}
+                        <div className="flex items-center justify-start">
+                            <img
+                                src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
+                                alt="Privue Logo"
+                                className="h-10 md:h-12 object-contain"
+                            />
                         </div>
 
                         {/* 2. 透明度スライダー */}
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-500 mb-2">Layer Opacity</h3>
+                            <h3 className="text-sm font-semibold text-gray-500 mb-2">透明度</h3> {/* テキスト変更 */}
                             <div className="flex items-center space-x-3">
                                 <input
                                     type="range"
@@ -95,6 +84,24 @@ export default function LayerMenu({
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* ▼ カードリストヘッダー：選択レイヤー + 複数選択ボタン ▼ */}
+                    <div className="mb-2 flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-gray-500">選択レイヤー</h3>
+                        {onToggleMultiSelectMode && (
+                            <button
+                                onClick={onToggleMultiSelectMode}
+                                aria-pressed={isMultiSelectMode}
+                                className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors duration-200 border ${
+                                    isMultiSelectMode
+                                        ? 'bg-blue-100 text-blue-700 border-blue-200'
+                                        : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
+                                }`}
+                            >
+                                複数選択
+                            </button>
+                        )}
                     </div>
 
                     {/* ▼ カードリストエリア ▼ */}
@@ -136,9 +143,8 @@ export default function LayerMenu({
 
                                     {/* チェックマーク (常時表示・色変化) */}
                                     <div
-                                        className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm transition-colors duration-200 ${
-                                            isActive ? 'bg-blue-500' : 'bg-black/30 border border-white/50'
-                                        }`}
+                                        className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm transition-colors duration-200 ${isActive ? 'bg-blue-500' : 'bg-black/30 border border-white/50'
+                                            }`}
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
