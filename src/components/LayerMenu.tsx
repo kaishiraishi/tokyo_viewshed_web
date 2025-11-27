@@ -13,6 +13,8 @@ interface LayerMenuProps {
     onClose: () => void;
     isMultiSelectMode?: boolean;
     onToggleMultiSelectMode?: () => void;
+    theme?: 'dark' | 'light';
+    onToggleTheme?: () => void;
 }
 
 const VIEWPOINT_CARDS: { id: SelectedViewpoint; label: string; imageUrl?: string; subtitle?: string }[] = [
@@ -32,6 +34,8 @@ export default function LayerMenu({
     onClose,
     isMultiSelectMode = false,
     onToggleMultiSelectMode,
+    theme = 'dark',
+    onToggleTheme,
 }: LayerMenuProps) {
     // ▼▼▼ ドラッグ操作用のRef ▼▼▼
     const containerRef = useRef<HTMLDivElement>(null);
@@ -115,6 +119,8 @@ export default function LayerMenu({
         }
     };
 
+    const isDark = theme === 'dark';
+
     return (
         <>
             {/* モバイル用バックドロップ */}
@@ -124,9 +130,11 @@ export default function LayerMenu({
                 ref={containerRef}
                 /* ▼▼▼ 変更: クラス制御 ▼▼▼ */
                 /* transition-none はJSでインライン制御するため、基本クラスには transition-transform を入れておく */
-                className={`layer-menu-container fixed bottom-0 left-0 right-0 bg-black/60 backdrop-blur-md text-white z-30
+                className={`layer-menu-container fixed bottom-0 left-0 right-0 z-30
+                    ${isDark ? 'bg-black/60 text-white border-white/10' : 'bg-white/80 text-gray-900 border-black/5'}
+                    backdrop-blur-md
                     transition-transform duration-300 ease-in-out
-                    md:relative md:transform-none md:w-80 md:h-full shadow-2xl rounded-t-2xl md:rounded-2xl flex flex-col border border-white/10
+                    md:relative md:transform-none md:w-80 md:h-full shadow-2xl rounded-t-2xl md:rounded-2xl flex flex-col border
                     ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-55px)] md:translate-y-0'}`
                 }
             >
@@ -140,7 +148,7 @@ export default function LayerMenu({
                     onPointerCancel={handlePointerUp}
                 >
                     <div className="flex flex-col items-center pointer-events-none">
-                        <div className="layer-menu-handle-bar w-10 h-1 bg-white/30 rounded-full" />
+                        <div className={`layer-menu-handle-bar w-10 h-1 rounded-full ${isDark ? 'bg-white/30' : 'bg-black/20'}`} />
                     </div>
                 </div>
 
@@ -148,18 +156,36 @@ export default function LayerMenu({
                 <div className="flex-1 overflow-y-auto p-4">
 
                     <div className="mb-6 space-y-6">
-                        {/* 1. ヘッダー: ロゴのみ */}
-                        <div className="flex items-center justify-start">
+                        {/* 1. ヘッダー: ロゴとテーマ切り替え */}
+                        <div className="flex items-center justify-between">
                             <img
                                 src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
                                 alt="Privue Logo"
-                                className="h-12 object-contain invert brightness-0"
+                                className={`h-12 object-contain transition-all duration-300 ${isDark ? 'invert brightness-0' : ''}`}
                             />
+
+                            {onToggleTheme && (
+                                <button
+                                    onClick={onToggleTheme}
+                                    className={`p-2 rounded-full transition-colors ${isDark ? 'bg-white/10 hover:bg-white/20 text-yellow-300' : 'bg-black/5 hover:bg-black/10 text-orange-500'}`}
+                                    aria-label="Toggle theme"
+                                >
+                                    {isDark ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                            <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                            <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+                                        </svg>
+                                    )}
+                                </button>
+                            )}
                         </div>
 
                         {/* 2. 透明度スライダー */}
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-400 mb-2">Layer Opacity</h3>
+                            <h3 className={`text-sm font-semibold mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Layer Opacity</h3>
                             <div className="flex items-center space-x-3">
                                 <input
                                     type="range"
@@ -168,9 +194,9 @@ export default function LayerMenu({
                                     step="0.1"
                                     value={layerOpacity}
                                     onChange={(e) => onChangeOpacity(parseFloat(e.target.value))}
-                                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                    className={`flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-500 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`}
                                 />
-                                <div className="w-10 text-right text-sm text-gray-300 font-medium">
+                                <div className={`w-10 text-right text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                     {Math.round(layerOpacity * 100)}%
                                 </div>
                             </div>
@@ -178,14 +204,16 @@ export default function LayerMenu({
                         {/* 3. レイヤー選択セクション */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-semibold text-gray-400">Select Layer</h3>
+                                <h3 className={`text-sm font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Select Layer</h3>
                                 {onToggleMultiSelectMode && (
                                     <button
                                         onClick={onToggleMultiSelectMode}
                                         aria-pressed={isMultiSelectMode}
                                         className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors duration-200 border ${isMultiSelectMode
                                             ? 'bg-blue-500/30 text-blue-300 border-blue-400/50'
-                                            : 'bg-white/10 text-gray-300 border-white/10 hover:bg-white/20'
+                                            : isDark
+                                                ? 'bg-white/10 text-gray-300 border-white/10 hover:bg-white/20'
+                                                : 'bg-black/5 text-gray-600 border-black/10 hover:bg-black/10'
                                             }`}
                                     >
                                         複数選択

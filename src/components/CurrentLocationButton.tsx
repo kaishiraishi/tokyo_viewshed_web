@@ -2,12 +2,19 @@ import React from 'react';
 
 interface CurrentLocationButtonProps {
     onClick: () => void;
+    theme?: 'dark' | 'light';
 }
 
-export default function CurrentLocationButton({ onClick }: CurrentLocationButtonProps) {
+export default function CurrentLocationButton({ onClick, theme = 'dark' }: CurrentLocationButtonProps) {
+    const isDark = theme === 'dark';
+
     return (
         <button
-            className="current-location-button absolute bottom-6 right-6 z-10 bg-black/60 backdrop-blur-md border border-white/10 p-3 rounded-full shadow-lg text-white hover:bg-black/70 active:bg-black/80 transition-colors md:bottom-8 md:right-8"
+            className={`current-location-button absolute bottom-6 right-6 z-10 p-3 rounded-full shadow-lg backdrop-blur-md border transition-colors md:bottom-8 md:right-8
+                ${isDark
+                    ? 'bg-black/60 border-white/10 text-white hover:bg-black/70 active:bg-black/80'
+                    : 'bg-white/80 border-black/5 text-gray-700 hover:bg-white/90 active:bg-white'
+                }`}
             onClick={onClick}
             aria-label="現在地へ移動"
         >

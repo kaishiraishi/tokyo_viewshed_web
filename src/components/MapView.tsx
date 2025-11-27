@@ -10,6 +10,7 @@ interface MapViewProps {
     layerOpacity: number;
     center: { lng: number; lat: number } | null;
     heading: number | null;
+    theme?: 'dark' | 'light';
 }
 
 // ソース定義をすっきりさせるために配列化しておきます
@@ -20,21 +21,80 @@ const VIEWSHED_SOURCES = [
     { id: 'tocho', url: `${R2_BASE_URL}/viewshed_tocho_inf_3857_rgba_tiles/{z}/{x}/{y}.png` },
 ];
 
-export default function MapView({ selectedViewpoints, layerOpacity, center, heading }: MapViewProps) {
+export default function MapView({ selectedViewpoints, layerOpacity, center, heading, theme = 'dark' }: MapViewProps) {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<maplibregl.Map | null>(null);
     const marker = useRef<maplibregl.Marker | null>(null);
     const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+    // レイヤーを追加する関数
+    const addLayers = () => {
+        if (!map.current) return;
+
+        VIEWSHED_SOURCES.forEach((source) => {
+            if (map.current!.getSource(source.id)) return; // 既にある場合はスキップ
+
+            // ソースを追加
+            map.current!.addSource(source.id, {
+                type: 'raster',
+                tiles: [source.url],
+                tileSize: 256,
+            });
+
+            // レイヤーを追加
+            map.current!.addLayer({
+                id: `${source.id}-layer`,
+                type: 'raster',
+                source: source.id,
+                paint: {
+                    'raster-opacity': 0, // 初期状態は透明
+                },
+                layout: {
+                    visibility: 'none' // 初期状態は非表示
+                }
+            });
+        });
+
+        // レイヤーの状態を更新（再適用）
+        updateLayerState();
+    };
+
+    // レイヤーの状態（表示・不透明度）を更新する関数
+    const updateLayerState = () => {
+        if (!map.current) return;
+        const mapInstance = map.current;
+
+        const layers = [
+            { id: 'tokyotower-layer', viewpoint: 'tokyoTower' },
+            { id: 'skytree-layer', viewpoint: 'skytree' },
+            { id: 'docomo-layer', viewpoint: 'docomo' },
+            { id: 'tocho-layer', viewpoint: 'tocho' },
+        ];
+
+        layers.forEach(layer => {
+            if (mapInstance.getLayer(layer.id)) {
+                const isSelected = (selectedViewpoints as any).includes(layer.viewpoint);
+                const opacity = isSelected ? layerOpacity : 0;
+                const visibility = isSelected ? 'visible' : 'none';
+
+                mapInstance.setPaintProperty(layer.id, 'raster-opacity', opacity);
+                mapInstance.setLayoutProperty(layer.id, 'visibility', visibility);
+            }
+        });
+    };
 
     // Initialize Map
     useEffect(() => {
         if (map.current) return;
         if (!mapContainer.current) return;
 
+        const styleUrl = theme === 'dark'
+            ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+            : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+
         map.current = new maplibregl.Map({
             container: mapContainer.current,
-            // ▼▼▼ 変更点1: ここでURLを指定するだけでダークモードになります ▼▼▼
-            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            style: styleUrl,
             center: [139.7454, 35.6586],
             zoom: 13,
             attributionControl: false,
@@ -43,32 +103,8 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
         map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
         map.current.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-right');
 
-        // ▼▼▼ 変更点2: 地図のスタイル読み込み完了「後」にR2レイヤーを追加します ▼▼▼
         map.current.on('load', () => {
-            if (!map.current) return;
-
-            VIEWSHED_SOURCES.forEach((source) => {
-                // ソースを追加
-                map.current!.addSource(source.id, {
-                    type: 'raster',
-                    tiles: [source.url],
-                    tileSize: 256,
-                });
-
-                // レイヤーを追加
-                map.current!.addLayer({
-                    id: `${source.id}-layer`,
-                    type: 'raster',
-                    source: source.id,
-                    paint: {
-                        'raster-opacity': 0, // 初期状態は透明
-                    },
-                    layout: {
-                        visibility: 'none' // 初期状態は非表示
-                    }
-                });
-            });
-
+            addLayers();
             setIsMapLoaded(true);
         });
 
@@ -79,31 +115,26 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
         };
     }, []);
 
+    // Theme Change Effect
+    useEffect(() => {
+        if (!map.current) return;
+
+        const styleUrl = theme === 'dark'
+            ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+            : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+
+        map.current.setStyle(styleUrl);
+
+        // スタイル変更後にレイヤーを再追加
+        map.current.once('styledata', () => {
+            addLayers();
+        });
+    }, [theme]);
+
     // Update Viewpoints and Opacity
     useEffect(() => {
         if (!map.current || !isMapLoaded) return;
-        const mapInstance = map.current;
-
-        // レイヤーIDのリスト
-        const layers = [
-            { id: 'tokyotower-layer', viewpoint: 'tokyoTower' },
-            { id: 'skytree-layer', viewpoint: 'skytree' },
-            { id: 'docomo-layer', viewpoint: 'docomo' },
-            { id: 'tocho-layer', viewpoint: 'tocho' },
-        ];
-
-        layers.forEach(layer => {
-            // レイヤーが存在するか確認してからプロパティを変更
-            if (mapInstance.getLayer(layer.id)) {
-                const isSelected = (selectedViewpoints as any).includes(layer.viewpoint);
-                const opacity = isSelected ? layerOpacity : 0;
-                const visibility = isSelected ? 'visible' : 'none';
-
-                mapInstance.setPaintProperty(layer.id, 'raster-opacity', opacity);
-                mapInstance.setLayoutProperty(layer.id, 'visibility', visibility);
-            }
-        });
-
+        updateLayerState();
     }, [selectedViewpoints, layerOpacity, isMapLoaded]);
 
     // Update Center (Geolocation)

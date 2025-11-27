@@ -1,9 +1,16 @@
+import { useState } from 'react';
 import MapView from './components/MapView';
 import LayerMenu from './components/LayerMenu';
 import CurrentLocationButton from './components/CurrentLocationButton';
 import { useMapViewState } from './hooks/useMapViewState';
 
 function App() {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   const {
     selectedViewpoints,
     toggleViewpoint,
@@ -31,6 +38,8 @@ function App() {
         onClose={closeLayerMenu}
         isMultiSelectMode={isMultiSelectMode}
         onToggleMultiSelectMode={toggleMultiSelectMode}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <div className="flex-1 relative h-full">
@@ -39,11 +48,12 @@ function App() {
           layerOpacity={layerOpacity}
           center={currentLocation}
           heading={heading}
+          theme={theme}
         />
 
         {/* CurrentLocationButtonだけを残します */}
         {!isLayerMenuOpen && (
-          <CurrentLocationButton onClick={locateMe} />
+          <CurrentLocationButton onClick={locateMe} theme={theme} />
         )}
 
         {/* 削除しました: メニューを開くためのフローティングボタン */}
