@@ -41,20 +41,12 @@ function App() {
           heading={heading}
         />
 
+        {/* CurrentLocationButtonだけを残します */}
         {!isLayerMenuOpen && (
           <CurrentLocationButton onClick={locateMe} />
         )}
 
-        {!isLayerMenuOpen && (
-          <button
-            className="md:hidden absolute bottom-6 right-6 z-10 bg-white p-3 rounded-full shadow-lg"
-            onClick={openLayerMenu}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </button>
-        )}
+        {/* 削除しました: メニューを開くためのフローティングボタン */}
       </div>
     </div>
   );

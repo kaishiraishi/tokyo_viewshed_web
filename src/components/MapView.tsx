@@ -187,7 +187,8 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
 
         // Create HTML element for marker
         const markerElement = document.createElement('div');
-        markerElement.className = 'location-arrow';
+        // Google Maps風の青い丸（白フチ・パルス）に変更
+        markerElement.className = 'user-location-dot';
 
         // Create marker with custom element
         marker.current = new maplibregl.Marker({

@@ -17,33 +17,58 @@ body,
   /* Flex layout handled by Tailwind classes in App.tsx */
 }
 
-/* Location Arrow Marker */
-.location-arrow {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
+/* 現在位置マーカー（青い丸） */
+.user-location-dot {
+  width: 20px;
+  height: 20px;
+  background-color: #1a73e8; /* Google Mapsっぽい青 */
   border: 3px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform-origin: center center;
-  transition: transform 0.3s ease-out;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   position: relative;
+  /* 回転しても丸なので見た目は変わりませんが、Headingのロジックは残しておきます */
 }
 
-.location-arrow::before {
+/* パルスアニメーション（ポワワンと広がる波紋） */
+.user-location-dot::after {
   content: '';
   position: absolute;
-  top: 4px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px; /* 本体の2倍くらいの大きさ */
+  height: 40px;
+  background-color: rgba(26, 115, 232, 0.4);
+  border-radius: 50%;
+  z-index: -1;
+  animation: pulse-ring 2s infinite;
+}
+
+/* 向きを表す小さな矢印（Heading がある場合のみわかる） */
+.user-location-dot::before {
+  content: '';
+  position: absolute;
+  top: -4px; /* 上端に配置 */
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 12px solid white;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 5px solid #1a73e8; /* 青い三角 */
+}
+
+@keyframes pulse-ring {
+  0% {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+  }
 }
 
 /* Current Location Button - Additional styles beyond Tailwind */

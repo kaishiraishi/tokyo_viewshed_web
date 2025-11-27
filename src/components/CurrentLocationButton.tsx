@@ -1,46 +1,22 @@
-import { useState } from 'react';
+import React from 'react';
 
 interface CurrentLocationButtonProps {
     onClick: () => void;
-    isDisabled?: boolean;
 }
 
-export default function CurrentLocationButton({ onClick, isDisabled = false }: CurrentLocationButtonProps) {
-    const [isRaised, setIsRaised] = useState(false);
-
-    const handleClick = () => {
-        setIsRaised(true);
-        onClick();
-    };
-
-    const handleMouseEnter = () => {
-        setIsRaised(true);
-    };
-
+export default function CurrentLocationButton({ onClick }: CurrentLocationButtonProps) {
     return (
         <button
-            onClick={handleClick}
-            onMouseEnter={handleMouseEnter}
-            disabled={isDisabled}
-            className={`current-location-button fixed z-20 w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:shadow-xl active:scale-95 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed ${isRaised ? 'current-location-button--raised' : ''
-                }`}
-            aria-label="Find my location"
+            className="current-location-button absolute bottom-6 right-6 z-10 bg-white p-3 rounded-full shadow-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors md:bottom-8 md:right-8"
+            onClick={onClick}
+            aria-label="現在地へ移動"
         >
-            {/* Navigation Icon (SVG) */}
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"
-                />
+            {/* ▼ Google Material Symbols: assistant_navigation のSVG ▼ */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                {/* ▼▼▼ 以前の <path d="M9 6.75..." /> を削除して、以下に書き換え ▼▼▼ */}
+                <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
             </svg>
+            {/* ▲ ここまで ▲ */}
         </button>
     );
 }
