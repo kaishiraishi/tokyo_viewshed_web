@@ -56,16 +56,12 @@ export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutMod
                         className={`h-16 object-contain ${isDark ? 'invert brightness-0' : ''}`}
                     />
 
-                    <div className="space-y-2">
-                        <h2 className="text-xl font-bold tracking-tight">Privue Tokyo</h2>
-                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Tokyo Viewshed Visualization Map
-                        </p>
-                    </div>
-
                     <div className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <p className="font-bold text-lg mb-2">
+                            可視領域アプリケーション
+                        </p>
                         <p>
-                            東京の主要なランドマークからの可視領域（Viewshed）を可視化したマップアプリケーションです。
+                            東京の主要なランドマークを見ることができる可視領域（Viewshed）を可視化したマップです。PLATEAUのデータを使用した、夜景スポットを探索するwebアプリケーションです。
                         </p>
                         <p className="mt-4 text-xs opacity-70">
                             Version 1.0.0
@@ -80,7 +76,7 @@ export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutMod
                                 : 'bg-black text-white hover:bg-gray-800'
                                 }`}
                         >
-                            閉じる
+                            探索する
                         </button>
                     </div>
                 </div>
