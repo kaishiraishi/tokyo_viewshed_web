@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import AboutModal from './AboutModal';
 import type { SelectedViewpoint } from '../types/map';
 
 const R2_BASE_URL = 'https://pub-270c6735fbc041bdb5476aaf4093cf55.r2.dev';
@@ -43,6 +44,7 @@ export default function LayerMenu({
     const containerRef = useRef<HTMLDivElement>(null);
     const touchStartY = useRef<number>(0);
     const isDraggingRef = useRef(false);
+    const [isAboutOpen, setIsAboutOpen] = useState(true);
 
     // ハンドルの高さ（閉じたときに見えている部分）
     const HANDLE_HEIGHT = 55;
@@ -134,6 +136,7 @@ export default function LayerMenu({
 
     return (
         <>
+            <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} theme={theme} />
             {/* モバイル用バックドロップ */}
             {isOpen && <div className="layer-menu-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" onClick={onClose} />}
 
@@ -169,11 +172,17 @@ export default function LayerMenu({
                     <div className="mb-6 space-y-6">
                         {/* 1. ヘッダー: ロゴとテーマ切り替え */}
                         <div className="flex items-center justify-between">
-                            <img
-                                src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
-                                alt="Privue Logo"
-                                className={`h-12 object-contain transition-all duration-300 ${isDark ? 'invert brightness-0' : ''}`}
-                            />
+                            <button
+                                onClick={() => setIsAboutOpen(true)}
+                                className="transition-opacity hover:opacity-80 focus:outline-none"
+                                aria-label="About Privue"
+                            >
+                                <img
+                                    src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
+                                    alt="Privue Logo"
+                                    className={`h-12 object-contain transition-all duration-300 ${isDark ? 'invert brightness-0' : ''}`}
+                                />
+                            </button>
 
                             {onToggleTheme && (
                                 <button
