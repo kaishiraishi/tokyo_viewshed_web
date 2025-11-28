@@ -27,7 +27,7 @@ function App() {
   } = useMapViewState();
 
   return (
-    <div className="app-container flex flex-col md:flex-row h-screen w-screen overflow-hidden">
+    <div className="app-container flex flex-col md:flex-row h-[100dvh] w-full overflow-hidden">
       <LayerMenu
         selectedViewpoints={selectedViewpoints}
         layerOpacity={layerOpacity}

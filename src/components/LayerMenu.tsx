@@ -211,10 +211,10 @@ export default function LayerMenu({
                                     type="range"
                                     min="0"
                                     max="1"
-                                    step="0.1"
+                                    step="0.01"
                                     value={layerOpacity}
                                     onChange={(e) => onChangeOpacity(parseFloat(e.target.value))}
-                                    className={`flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-500 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`}
+                                    className="opacity-slider flex-1"
                                 />
                                 <div className={`w-10 text-right text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                     {Math.round(layerOpacity * 100)}%
