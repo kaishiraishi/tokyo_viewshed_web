@@ -53,27 +53,30 @@ export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutMod
                     <img
                         src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
                         alt="Privue Logo"
-                        className={`h-16 object-contain ${isDark ? 'invert brightness-0' : ''}`}
+                        className={`h-16 object-contain transition-opacity duration-300 hover:opacity-70 ${isDark ? 'invert brightness-0' : ''}`}
                     />
 
                     <div className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                         <p className="font-bold text-lg mb-2">
-                            可視領域アプリケーション
+                            About
+                        </p>
+                        <p className="mb-2">
+                            3D都市モデル「PLATEAU」を活用した、夜景探索アプリケーションです。
                         </p>
                         <p>
-                            東京の主要なランドマークを見ることができる可視領域（Viewshed）を可視化したマップです。PLATEAUのデータを使用した、夜景スポットを探索するwebアプリケーションです。
+                            地図上のプロットされたエリアは、選択したランドマークが見える場所を示しています。実際の風景は、ぜひあなたの目で確かめてください。
                         </p>
-                        <p className="mt-4 text-xs opacity-70">
-                            Version 1.0.0
+                        <p className="mt-4 text-xs opacity-60">
+                            v1.0.0 | Data source: MLIT PLATEAU
                         </p>
                     </div>
 
                     <div className="pt-4 w-full">
                         <button
                             onClick={onClose}
-                            className={`w-full py-3 rounded-xl font-medium transition-colors ${isDark
-                                ? 'bg-white text-black hover:bg-gray-200'
-                                : 'bg-black text-white hover:bg-gray-800'
+                            className={`w-full py-3 rounded-xl font-medium transition-all duration-200 ${isDark
+                                ? 'bg-white text-black hover:bg-gray-300'
+                                : 'bg-black text-white hover:bg-gray-700'
                                 }`}
                         >
                             探索する

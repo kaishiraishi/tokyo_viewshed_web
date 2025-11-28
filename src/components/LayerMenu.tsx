@@ -205,7 +205,7 @@ export default function LayerMenu({
 
                         {/* 2. 透明度スライダー */}
                         <div>
-                            <h3 className={`text-sm font-semibold mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Layer Opacity</h3>
+                            <h3 className={`text-sm font-semibold mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>レイヤーの透明度</h3>
                             <div className="flex items-center space-x-3">
                                 <input
                                     type="range"
@@ -224,7 +224,7 @@ export default function LayerMenu({
                         {/* 3. レイヤー選択セクション */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <h3 className={`text-sm font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Select Layer</h3>
+                                <h3 className={`text-sm font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>ランドマークの選択</h3>
                                 {onToggleMultiSelectMode && (
                                     <button
                                         onClick={onToggleMultiSelectMode}
@@ -254,7 +254,18 @@ export default function LayerMenu({
                                 <button
                                     key={card.id}
                                     onClick={() => onToggleViewpoint(card.id)}
-                                    className={`relative flex-shrink-0 w-32 aspect-square rounded-xl overflow-hidden transition-all duration-300 md:w-full md:h-auto md:aspect-video shadow-lg hover:shadow-2xl hover:-translate-y-1 group ${isActive ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900' : ''
+                                    className={`relative flex-shrink-0 w-32 aspect-square rounded-xl overflow-hidden transition-all duration-200 
+                                        /* PC用: ホバーで少し浮く & 影が強くなる */
+                                        md:hover:scale-105 md:hover:shadow-2xl md:hover:-translate-y-1
+                                        
+                                        /* ★ スマホ用: 押した瞬間に少し縮む (これがクリック感になる) */
+                                        active:scale-95 active:duration-75
+
+                                        /* グループ化など既存のクラス */
+                                        shadow-lg group 
+                                        ${isActive
+                                            ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900 z-10'
+                                            : 'z-0'
                                         }`}
                                 >
                                     {/* 背景画像 */}

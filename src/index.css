@@ -13,6 +13,11 @@ body,
   /* Prevent scrolling */
 }
 
+/* ボタンをタップした時の標準ハイライトを透明にする */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .app-container {
   /* Flex layout handled by Tailwind classes in App.tsx */
 }
@@ -21,7 +26,8 @@ body,
 .user-location-dot {
   width: 20px;
   height: 20px;
-  background-color: #1a73e8; /* Google Mapsっぽい青 */
+  background-color: #1a73e8;
+  /* Google Mapsっぽい青 */
   border: 3px solid white;
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -36,7 +42,8 @@ body,
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 40px; /* 本体の2倍くらいの大きさ */
+  width: 40px;
+  /* 本体の2倍くらいの大きさ */
   height: 40px;
   background-color: rgba(26, 115, 232, 0.4);
   border-radius: 50%;
@@ -48,14 +55,16 @@ body,
 .user-location-dot::before {
   content: '';
   position: absolute;
-  top: -4px; /* 上端に配置 */
+  top: -4px;
+  /* 上端に配置 */
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-bottom: 5px solid #1a73e8; /* 青い三角 */
+  border-bottom: 5px solid #1a73e8;
+  /* 青い三角 */
 }
 
 @keyframes pulse-ring {
@@ -64,6 +73,7 @@ body,
     height: 20px;
     opacity: 0.8;
   }
+
   100% {
     width: 60px;
     height: 60px;
