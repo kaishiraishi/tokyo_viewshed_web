@@ -15,6 +15,7 @@ interface LayerMenuProps {
     onToggleMultiSelectMode?: () => void;
     theme?: 'dark' | 'light';
     onToggleTheme?: () => void;
+    currentLocation?: { lat: number; lng: number } | null;
 }
 
 const VIEWPOINT_CARDS: { id: SelectedViewpoint; label: string; imageUrl?: string; subtitle?: string }[] = [
@@ -36,6 +37,7 @@ export default function LayerMenu({
     onToggleMultiSelectMode,
     theme = 'dark',
     onToggleTheme,
+    currentLocation,
 }: LayerMenuProps) {
     // ▼▼▼ ドラッグ操作用のRef ▼▼▼
     const containerRef = useRef<HTMLDivElement>(null);
@@ -120,6 +122,15 @@ export default function LayerMenu({
     };
 
     const isDark = theme === 'dark';
+
+    const handleSaveLocation = () => {
+        if (!currentLocation) {
+            alert('現在地が取得できていません');
+            return;
+        }
+        const url = `https://www.google.com/maps/search/?api=1&query=${currentLocation.lat},${currentLocation.lng}`;
+        window.open(url, '_blank');
+    };
 
     return (
         <>
@@ -221,6 +232,8 @@ export default function LayerMenu({
                                 )}
                             </div>
                         </div>
+
+
                     </div>
 
                     {/* カードリストエリア */}
@@ -283,6 +296,22 @@ export default function LayerMenu({
                                 </button>
                             );
                         })}
+                    </div>
+
+                    {/* 4. 現在地を保存ボタン (カードの下に移動) */}
+                    <div className="mt-4 px-1">
+                        <button
+                            onClick={handleSaveLocation}
+                            className={`w-full py-3 px-4 rounded-xl flex items-center justify-center space-x-2 transition-colors font-medium ${isDark
+                                ? 'bg-white/10 hover:bg-white/20 text-white'
+                                : 'bg-black/5 hover:bg-black/10 text-gray-800'
+                                }`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                            </svg>
+                            <span>現在地をGoogle Mapで保存</span>
+                        </button>
                     </div>
                 </div>
             </div>

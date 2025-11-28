@@ -40,6 +40,7 @@ function App() {
         onToggleMultiSelectMode={toggleMultiSelectMode}
         theme={theme}
         onToggleTheme={toggleTheme}
+        currentLocation={currentLocation}
       />
 
       <div className="flex-1 relative h-full">
