@@ -21,6 +21,14 @@ const VIEWSHED_SOURCES = [
     { id: 'tocho', url: `${R2_BASE_URL}/viewshed_tocho_inf_3857_rgba_tiles/{z}/{x}/{y}.png` },
 ];
 
+// 各建物の座標
+const BUILDING_LOCATIONS = [
+    { id: 'tokyotower', name: '東京タワー', lng: 139.7454, lat: 35.6586, icon: 'tower_icon/tokyotower_icon.png' },
+    { id: 'skytree', name: '東京スカイツリー', lng: 139.8107, lat: 35.7101, icon: 'tower_icon/skytree_icon.png' },
+    { id: 'docomo', name: 'NTTドコモ代々木ビル', lng: 139.6997, lat: 35.6825, icon: 'tower_icon/docomotower_icon.png' },
+    { id: 'tocho', name: '東京都庁', lng: 139.6917, lat: 35.6896, icon: 'tower_icon/tocho_icon.png' },
+];
+
 export default function MapView({ selectedViewpoints, layerOpacity, center, heading, theme = 'dark' }: MapViewProps) {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<maplibregl.Map | null>(null);
@@ -85,6 +93,41 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
         });
     };
 
+    // 建物マーカーを追加する関数
+    const addBuildingMarkers = () => {
+        if (!map.current) return;
+
+        BUILDING_LOCATIONS.forEach((building) => {
+            // マーカー用のカスタム要素を作成
+            const el = document.createElement('div');
+            el.className = 'building-marker';
+
+            // base パスを考慮してURLを生成（各建物のアイコンを使用）
+            const iconUrl = `${import.meta.env.BASE_URL}${building.icon}`;
+            el.innerHTML = `<img src="${iconUrl}" alt="${building.name}" />`;
+
+            // ポップアップを作成
+            const popup = new maplibregl.Popup({
+                offset: 25,
+                closeButton: true,
+                closeOnClick: false,
+            }).setHTML(`
+                <div class="building-popup">
+                    <div class="font-bold">${building.name}</div>
+                </div>
+            `);
+
+            // マーカーを追加
+            new maplibregl.Marker({
+                element: el,
+                anchor: 'bottom',
+            })
+                .setLngLat([building.lng, building.lat])
+                .setPopup(popup)
+                .addTo(map.current!);
+        });
+    };
+
     // Initialize Map
     useEffect(() => {
         if (map.current) return;
@@ -104,6 +147,7 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
 
         map.current.on('load', () => {
             addLayers();
+            addBuildingMarkers();
             setIsMapLoaded(true);
         });
 

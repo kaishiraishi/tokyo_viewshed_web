@@ -273,3 +273,28 @@ button {
 .click-popup {
   font-family: inherit;
 }
+
+/* Building Marker Styles */
+.building-marker {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+.building-marker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.building-marker:hover {
+  transform: scale(1.2);
+}
+
+/* Building Popup */
+.building-popup {
+  font-family: inherit;
+  text-align: center;
+}
