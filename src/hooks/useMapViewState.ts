@@ -6,8 +6,11 @@ export function useMapViewState() {
 	const [selectedViewpoints, setSelectedViewpoints] = useState<SelectedViewpoint[]>(['tokyoTower']);
 	const [isMultiSelectMode, setIsMultiSelectMode] = useState<boolean>(false);
 
-	const [layerOpacity, setLayerOpacity] = useState<number>(0.7);
-	const [isLayerMenuOpen, setIsLayerMenuOpen] = useState<boolean>(false);
+	const [layerOpacity, setLayerOpacity] = useState<number>(0.95);
+	// PCの場合は初期表示、スマホは非表示
+	const [isLayerMenuOpen, setIsLayerMenuOpen] = useState<boolean>(
+		typeof window !== 'undefined' ? window.innerWidth >= 768 : false
+	);
 	const [currentLocation, setCurrentLocation] = useState<{ lng: number; lat: number } | null>(null);
 	const [heading, setHeading] = useState<number | null>(null);
 
@@ -72,11 +75,31 @@ export function useMapViewState() {
 		navigator.geolocation.getCurrentPosition(handleSuccess, handleError, options);
 	}, []);
 
+	// 方角管理
+	const [mapBearing, setMapBearing] = useState<number>(0);
+	const [northResetTrigger, setNorthResetTrigger] = useState<number>(0); // 0 = 初期値(何もしない)
+
+	const handleRotate = useCallback((bearing: number) => {
+		setMapBearing(bearing);
+	}, []);
+
+	const handleResetLocate = useCallback(() => {
+		// 北を向いていない（誤差許容）場合は北に戻す
+		// bearing は -180 ~ 180 (MapLibre)
+		if (Math.abs(mapBearing) > 5) {
+			// タイムスタンプをセットしてトリガーを発火させる（毎回値が変わるように）
+			setNorthResetTrigger(Date.now());
+		} else {
+			// 北を向いているなら現在地へ
+			locateMe();
+		}
+	}, [mapBearing, locateMe]);
+
 	return {
 		selectedViewpoints,
-		toggleViewpoint: handleViewpointClick, // 既存の名前を維持してモード別挙動へ
-		isMultiSelectMode, // 追加
-		toggleMultiSelectMode, // 追加
+		toggleViewpoint: handleViewpointClick,
+		isMultiSelectMode,
+		toggleMultiSelectMode,
 		layerOpacity,
 		setLayerOpacity,
 		isLayerMenuOpen,
@@ -86,6 +109,9 @@ export function useMapViewState() {
 		currentLocation,
 		heading,
 		setHeading,
-		locateMe,
+		locateMe: handleResetLocate, // ボタンにはこのラッパー関数を渡す
+		mapBearing,       // 追加
+		handleRotate,     // 追加
+		northResetTrigger, // 変更
 	};
 }

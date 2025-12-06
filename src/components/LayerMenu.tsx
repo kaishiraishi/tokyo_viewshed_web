@@ -38,7 +38,6 @@ export default function LayerMenu({
     onToggleMultiSelectMode,
     theme = 'dark',
     onToggleTheme,
-    currentLocation,
 }: LayerMenuProps) {
     // ▼▼▼ ドラッグ操作用のRef ▼▼▼
     const containerRef = useRef<HTMLDivElement>(null);
@@ -125,20 +124,29 @@ export default function LayerMenu({
 
     const isDark = theme === 'dark';
 
-    const handleSaveLocation = () => {
-        if (!currentLocation) {
-            alert('現在地が取得できていません');
-            return;
-        }
-        const url = `https://www.google.com/maps/search/?api=1&query=${currentLocation.lat},${currentLocation.lng}`;
-        window.open(url, '_blank');
-    };
+    /* handleSaveLocation removed */
 
     return (
         <>
             <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} theme={theme} />
             {/* モバイル用バックドロップ */}
             {isOpen && <div className="layer-menu-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" onClick={onClose} />}
+
+            {/* PC Toggle Button (Outside Container) */}
+            <button
+                onClick={isOpen ? onClose : onOpen}
+                className={`hidden md:flex absolute top-1/2 -translate-y-1/2 z-40 items-center justify-center w-8 h-24 
+                    rounded-r-xl shadow-md transition-all duration-300 ease-in-out border-y border-r
+                    ${isDark
+                        ? 'bg-black/60 border-white/10 text-white hover:bg-black/80'
+                        : 'bg-white/80 border-black/5 text-gray-600 hover:bg-white'}
+                    ${isOpen ? 'left-[21rem]' /* 20rem(w-80) + 1rem(left-4) */ : 'left-0 rounded-l-none'}`}
+                aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-6 h-6 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                </svg>
+            </button>
 
             <div
                 ref={containerRef}
@@ -148,8 +156,11 @@ export default function LayerMenu({
                     ${isDark ? 'bg-black/60 text-white border-white/10' : 'bg-white/80 text-gray-900 border-black/5'}
                     backdrop-blur-md
                     transition-transform duration-300 ease-in-out
-                    md:relative md:transform-none md:w-80 md:h-full shadow-2xl rounded-t-2xl md:rounded-2xl flex flex-col border
-                    ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-55px)] md:translate-y-0'}`
+                    md:absolute md:top-4 md:left-4 md:bottom-4 md:w-80 md:rounded-2xl flex flex-col border
+                    ${isOpen
+                        ? 'translate-y-0 md:translate-x-0'
+                        : 'translate-y-[calc(100%-55px)] md:-translate-x-[calc(100%+16px)]' /* 16px is left margin */
+                    }`
                 }
             >
 
@@ -318,20 +329,26 @@ export default function LayerMenu({
                         })}
                     </div>
 
-                    {/* 4. 現在地を保存ボタン (カードの下に移動) */}
-                    <div className="mt-4 px-1">
-                        <button
-                            onClick={handleSaveLocation}
-                            className={`w-full py-3 px-4 rounded-xl flex items-center justify-center space-x-2 transition-colors font-medium ${isDark
-                                ? 'bg-white/10 hover:bg-white/20 text-white'
-                                : 'bg-black/5 hover:bg-black/10 text-gray-800'
-                                }`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                                <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                            </svg>
-                            <span>現在地をGoogle Mapで保存</span>
-                        </button>
+                    {/* 4. Footer Credits */}
+                    <div className="mt-auto px-1 pt-4 pb-2">
+                        <div className={`text-[10px] space-y-1.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+
+                            <div className="font-semibold opacity-90">Contribution</div>
+
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 opacity-80">
+                                <span>
+                                    Map: {' '}
+                                    <a href="https://maplibre.org/" target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">MapLibre</a>
+                                    , {' '}
+                                    <a href="https://www.openstreetmap.org/" target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">OpenStreetMap</a>
+                                </span>
+                                <span>
+                                    Datasource: {' '}
+                                    <a href="https://www.mlit.go.jp/plateau/" target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">PLATEAU</a>
+                                </span>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>

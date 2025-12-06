@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
-interface AboutModalProps {
+interface ScoringDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     theme?: 'dark' | 'light';
 }
 
-export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutModalProps) {
+export default function ScoringDetailsModal({ isOpen, onClose, theme = 'dark' }: ScoringDetailsModalProps) {
     const [isVisible, setIsVisible] = useState(false);
     const isDark = theme === 'dark';
 
@@ -33,8 +33,8 @@ export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutMod
             <div
                 className={`relative w-full max-w-sm transform transition-all duration-300 scale-100 ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                     } ${isDark
-                        ? 'bg-black/80 border border-white/10 text-white'
-                        : 'bg-white/90 border border-black/5 text-gray-900'
+                        ? 'bg-black/90 border border-white/10 text-white'
+                        : 'bg-white/95 border border-black/5 text-gray-900'
                     } backdrop-blur-xl rounded-3xl p-8 shadow-2xl`}
             >
                 {/* Close Button */}
@@ -50,22 +50,15 @@ export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutMod
 
                 {/* Content */}
                 <div className="flex flex-col items-center text-center space-y-6">
-                    <img
-                        src={`${import.meta.env.BASE_URL}logo/Privue_logo_black.png`}
-                        alt="Privue Logo"
-                        className={`h-16 object-contain transition-opacity duration-300 hover:opacity-70 ${isDark ? 'invert brightness-0' : ''}`}
-                    />
-
                     <div className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <p className="font-bold text-lg mb-2">
-                            About
+                        <p className="font-bold text-lg mb-4">
+                            夜景スコア算出の詳細
                         </p>
-                        3D都市モデル「<a href="https://www.mlit.go.jp/plateau/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">PLATEAU</a>」を活用した、夜景探索アプリケーションです。
                         <p>
-                            地図上のプロットされたエリアは、選択したランドマークが見える場所を示しています。実際の風景は、ぜひあなたの目で確かめてください。
+                            （ここに算出ロジックの詳細が入ります）
                         </p>
                         <p className="mt-4 text-xs opacity-60">
-                            v1.0.0 | Data source: MLIT PLATEAU
+                            Calculation logic version 1.0
                         </p>
                     </div>
 
@@ -77,7 +70,7 @@ export default function AboutModal({ isOpen, onClose, theme = 'dark' }: AboutMod
                                 : 'bg-black text-white hover:bg-gray-700'
                                 }`}
                         >
-                            探索する
+                            閉じる
                         </button>
                     </div>
                 </div>

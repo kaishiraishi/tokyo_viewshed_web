@@ -11,6 +11,9 @@ interface MapViewProps {
     center: { lng: number; lat: number } | null;
     heading: number | null;
     theme?: 'dark' | 'light';
+    onSelectViewpoint?: (viewpoint: SelectedViewpoint) => void;
+    northResetTrigger?: number; // タイムスタンプなどのトリガー
+    onRotate?: (bearing: number) => void;
 }
 
 // ソース定義をすっきりさせるために配列化しておきます
@@ -23,13 +26,13 @@ const VIEWSHED_SOURCES = [
 
 // 各建物の座標
 const BUILDING_LOCATIONS = [
-    { id: 'tokyotower', name: '東京タワー', lng: 139.7454, lat: 35.6586, icon: 'tower_icon/tokyotower_icon.png' },
+    { id: 'tokyoTower', name: '東京タワー', lng: 139.7454, lat: 35.6586, icon: 'tower_icon/tokyotower_icon.png' },
     { id: 'skytree', name: '東京スカイツリー', lng: 139.8107, lat: 35.7101, icon: 'tower_icon/skytree_icon.png' },
     { id: 'docomo', name: 'NTTドコモ代々木ビル', lng: 139.6997, lat: 35.6825, icon: 'tower_icon/docomotower_icon.png' },
     { id: 'tocho', name: '東京都庁', lng: 139.6917, lat: 35.6896, icon: 'tower_icon/tocho_icon.png' },
 ];
 
-export default function MapView({ selectedViewpoints, layerOpacity, center, heading, theme = 'dark' }: MapViewProps) {
+export default function MapView({ selectedViewpoints, layerOpacity, center, heading, theme = 'dark', onSelectViewpoint, northResetTrigger, onRotate }: MapViewProps) {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<maplibregl.Map | null>(null);
     const marker = useRef<maplibregl.Marker | null>(null);
@@ -104,26 +107,27 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
 
             // base パスを考慮してURLを生成（各建物のアイコンを使用）
             const iconUrl = `${import.meta.env.BASE_URL}${building.icon}`;
-            el.innerHTML = `<img src="${iconUrl}" alt="${building.name}" />`;
 
-            // ポップアップを作成
-            const popup = new maplibregl.Popup({
-                offset: 25,
-                closeButton: true,
-                closeOnClick: false,
-            }).setHTML(`
-                <div class="building-popup">
-                    <div class="font-bold">${building.name}</div>
-                </div>
-            `);
+            // アイコンとラベルを含むHTML
+            el.innerHTML = `
+                <img src="${iconUrl}" alt="${building.name}" />
+                <div class="building-label">${building.name}</div>
+            `;
+
+            // ポップアップは削除し、クリックイベントでレイヤー切り替え
+            el.addEventListener('click', (e) => {
+                e.stopPropagation(); // マップのクリックイベントへの伝播を防ぐ
+                if (onSelectViewpoint) {
+                    onSelectViewpoint(building.id as SelectedViewpoint);
+                }
+            });
 
             // マーカーを追加
             new maplibregl.Marker({
                 element: el,
-                anchor: 'bottom',
+                anchor: 'bottom', // アイコンの底辺が座標位置
             })
                 .setLngLat([building.lng, building.lat])
-                .setPopup(popup)
                 .addTo(map.current!);
         });
     };
@@ -151,6 +155,13 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
             setIsMapLoaded(true);
         });
 
+        // Rotate Event
+        map.current.on('rotate', () => {
+            if (onRotate && map.current) {
+                onRotate(map.current.getBearing());
+            }
+        });
+
         // クリックイベント: ピンを立てて座標を保存
         map.current.on('click', (e) => {
             const { lng, lat } = e.lngLat;
@@ -174,11 +185,10 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
             // ポップアップを作成
             const popup = new maplibregl.Popup({
                 offset: 25,
-                closeButton: true,
-                closeOnClick: false,
+                closeButton: false, // バツボタンをなくす
+                closeOnClick: true, // ポップアップ以外をクリックしたときに閉じる（デフォルトtrueだが明示）
             }).setHTML(`
-                <div class="click-popup text-xs">
-                    <div class="font-bold mb-1">ここへいく</div>
+                <div class="click-popup text-xs text-center">
                     <a
                         href="${googleMapsUrl}"
                         target="_blank"
@@ -204,6 +214,9 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
                 event.stopPropagation(); // マップのクリックイベントを防ぐ
                 clickMarker.current?.togglePopup();
             });
+
+            // 追加したばかりのマーカーのポップアップを即座に開く
+            clickMarker.current.togglePopup();
         });
 
         return () => {
@@ -272,6 +285,17 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
         }
     }, [heading]);
 
+    // Handle Reset North Trigger
+    useEffect(() => {
+        if (!map.current || !northResetTrigger) return; // 0 (初期値) の場合は何もしない
+        map.current.flyTo({
+            bearing: 0,
+            speed: 1.5,
+            curve: 1,
+            easing: (t) => t
+        });
+    }, [northResetTrigger]);
+
     return (
         <div className="relative w-full h-full">
             <div
@@ -279,12 +303,6 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
                 className="map-container w-full h-full"
                 style={{ width: '100%', height: '100%' }}
             />
-
-            {clickedCoord && (
-                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
-                    Lng: {clickedCoord.lng.toFixed(5)}, Lat: {clickedCoord.lat.toFixed(5)}
-                </div>
-            )}
         </div>
     );
 }
