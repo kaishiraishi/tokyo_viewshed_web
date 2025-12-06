@@ -105,9 +105,7 @@ button {
   }
 }
 
-.current-location-button:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+
 
 /* Raised state - general */
 .current-location-button--raised {
@@ -120,6 +118,7 @@ button {
   transform: translateY(-12px);
   /* Combine with raised state */
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  /* Blue background is now handled by Tailwind classes */
 }
 
 /* Layer Menu Enhancements */
@@ -236,4 +235,41 @@ button {
   border-radius: 50%;
   background: #3b82f6;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Click Pin Marker */
+.click-pin {
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.click-pin:hover {
+  transform: scale(1.2);
+}
+
+/* Popup Styles */
+.maplibregl-popup-content {
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(8px);
+}
+
+.maplibregl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.maplibregl-popup-close-button {
+  color: white !important;
+  font-size: 18px;
+  padding: 4px 8px;
+}
+
+.click-popup {
+  font-family: inherit;
 }

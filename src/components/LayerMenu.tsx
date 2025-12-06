@@ -254,9 +254,9 @@ export default function LayerMenu({
                                 <button
                                     key={card.id}
                                     onClick={() => onToggleViewpoint(card.id)}
-                                    className={`relative flex-shrink-0 w-32 aspect-square rounded-xl overflow-hidden transition-all duration-200 
+                                    className={`relative flex-shrink-0 w-32 md:w-full aspect-square md:aspect-video rounded-xl overflow-hidden transition-all duration-200 
                                         /* PC用: ホバーで少し浮く & 影が強くなる */
-                                        md:hover:scale-105 md:hover:shadow-2xl md:hover:-translate-y-1
+                                        md:hover:scale-[1.02] md:hover:shadow-2xl md:hover:-translate-y-1
                                         
                                         /* ★ スマホ用: 押した瞬間に少し縮む (これがクリック感になる) */
                                         active:scale-95 active:duration-75

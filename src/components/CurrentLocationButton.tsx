@@ -12,8 +12,8 @@ export default function CurrentLocationButton({ onClick, theme = 'dark' }: Curre
         <button
             className={`current-location-button absolute bottom-6 right-6 z-10 p-3 rounded-full shadow-lg backdrop-blur-md border transition-colors md:bottom-8 md:right-8
                 ${isDark
-                    ? 'bg-black/60 border-white/10 text-white hover:bg-black/70 active:bg-black/80'
-                    : 'bg-white/80 border-black/5 text-gray-700 hover:bg-white/90 active:bg-white'
+                    ? 'bg-black/60 border-white/10 text-white hover:bg-blue-500/80 active:bg-blue-600/80'
+                    : 'bg-white/80 border-black/5 text-gray-700 hover:bg-blue-500/80 hover:text-white active:bg-blue-600/80 active:text-white'
                 }`}
             onClick={onClick}
             aria-label="現在地へ移動"

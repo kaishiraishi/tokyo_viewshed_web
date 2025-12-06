@@ -4,6 +4,8 @@ import LayerMenu from './components/LayerMenu';
 import CurrentLocationButton from './components/CurrentLocationButton';
 import { useMapViewState } from './hooks/useMapViewState';
 
+import LegendPanel from './components/LegendPanel';
+
 function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
@@ -51,6 +53,9 @@ function App() {
           heading={heading}
           theme={theme}
         />
+
+        {/* Legend Panel */}
+        <LegendPanel theme={theme} selectedViewpoints={selectedViewpoints} />
 
         {/* CurrentLocationButtonだけを残します */}
         {!isLayerMenuOpen && (

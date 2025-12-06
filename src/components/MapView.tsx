@@ -25,7 +25,9 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<maplibregl.Map | null>(null);
     const marker = useRef<maplibregl.Marker | null>(null);
+    const clickMarker = useRef<maplibregl.Marker | null>(null);
     const [isMapLoaded, setIsMapLoaded] = useState(false);
+    const [clickedCoord, setClickedCoord] = useState<{ lng: number; lat: number } | null>(null);
 
     // レイヤーを追加する関数
     const addLayers = () => {
@@ -100,17 +102,71 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
             attributionControl: false,
         });
 
-        map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
-        map.current.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-right');
-
         map.current.on('load', () => {
             addLayers();
             setIsMapLoaded(true);
         });
 
+        // クリックイベント: ピンを立てて座標を保存
+        map.current.on('click', (e) => {
+            const { lng, lat } = e.lngLat;
+
+            // 座標を state に保存
+            setClickedCoord({ lng, lat });
+
+            // GoogleマップのURL
+            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
+            // 既存のクリックマーカーがあれば削除
+            if (clickMarker.current) {
+                clickMarker.current.remove();
+            }
+
+            // カスタム要素を作る（絵文字ピン）
+            const pinEl = document.createElement('div');
+            pinEl.className = 'click-pin';
+            pinEl.textContent = '📍';
+
+            // ポップアップを作成
+            const popup = new maplibregl.Popup({
+                offset: 25,
+                closeButton: true,
+                closeOnClick: false,
+            }).setHTML(`
+                <div class="click-popup text-xs">
+                    <div class="font-bold mb-1">ここへいく</div>
+                    <a
+                        href="${googleMapsUrl}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="underline text-blue-400 hover:text-blue-300"
+                    >
+                        Lng: ${lng.toFixed(5)}, Lat: ${lat.toFixed(5)}
+                    </a>
+                </div>
+            `);
+
+            // 新しいマーカーをクリック位置に立てる
+            clickMarker.current = new maplibregl.Marker({
+                element: pinEl,
+                anchor: 'bottom',
+            })
+                .setLngLat([lng, lat])
+                .setPopup(popup)
+                .addTo(map.current!);
+
+            // ピンをクリックしたときにポップアップを表示
+            pinEl.addEventListener('click', (event) => {
+                event.stopPropagation(); // マップのクリックイベントを防ぐ
+                clickMarker.current?.togglePopup();
+            });
+        });
+
         return () => {
             map.current?.remove();
             map.current = null;
+            marker.current?.remove();
+            clickMarker.current?.remove();
             setIsMapLoaded(false);
         };
     }, []);
@@ -173,10 +229,18 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
     }, [heading]);
 
     return (
-        <div
-            ref={mapContainer}
-            className="map-container w-full h-full"
-            style={{ width: '100%', height: '100%' }}
-        />
+        <div className="relative w-full h-full">
+            <div
+                ref={mapContainer}
+                className="map-container w-full h-full"
+                style={{ width: '100%', height: '100%' }}
+            />
+
+            {clickedCoord && (
+                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                    Lng: {clickedCoord.lng.toFixed(5)}, Lat: {clickedCoord.lat.toFixed(5)}
+                </div>
+            )}
+        </div>
     );
 }
