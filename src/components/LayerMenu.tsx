@@ -159,7 +159,7 @@ export default function LayerMenu({
                     md:absolute md:top-4 md:left-4 md:bottom-4 md:w-80 md:rounded-2xl flex flex-col border
                     ${isOpen
                         ? 'translate-y-0 md:translate-x-0'
-                        : 'translate-y-[calc(100%-55px)] md:-translate-x-[calc(100%+16px)]' /* 16px is left margin */
+                        : 'translate-y-[calc(100%-55px)] md:translate-y-0 md:-translate-x-[calc(100%+16px)]' /* 16px is left margin */
                     }`
                 }
             >

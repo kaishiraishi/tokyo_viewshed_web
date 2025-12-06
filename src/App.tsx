@@ -63,9 +63,7 @@ function App() {
         />
 
         {/* Current Location Button (Floating) */}
-        {!isLayerMenuOpen && (
-          <CurrentLocationButton onClick={locateMe} theme={theme} isNorthUp={isNorthUp} />
-        )}
+        <CurrentLocationButton onClick={locateMe} theme={theme} isNorthUp={isNorthUp} />
 
         {/* Layer Menu (Floating/Bottom Sheet) */}
         <LayerMenu

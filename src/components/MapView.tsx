@@ -290,6 +290,7 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
         if (!map.current || !northResetTrigger) return; // 0 (初期値) の場合は何もしない
         map.current.flyTo({
             bearing: 0,
+            pitch: 0,
             speed: 1.5,
             curve: 1,
             easing: (t) => t

@@ -31,11 +31,11 @@ export default function ScoringDetailsModal({ isOpen, onClose, theme = 'dark' }:
 
             {/* Modal Content */}
             <div
-                className={`relative w-full max-w-sm transform transition-all duration-300 scale-100 ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                className={`relative w-[90vw] md:max-w-3xl transform transition-all duration-300 scale-100 ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                     } ${isDark
                         ? 'bg-black/90 border border-white/10 text-white'
                         : 'bg-white/95 border border-black/5 text-gray-900'
-                    } backdrop-blur-xl rounded-3xl p-8 shadow-2xl`}
+                    } backdrop-blur-xl rounded-3xl py-6 md:py-10 shadow-2xl`}
             >
                 {/* Close Button */}
                 <button
@@ -54,12 +54,13 @@ export default function ScoringDetailsModal({ isOpen, onClose, theme = 'dark' }:
                         <p className="font-bold text-lg mb-4">
                             夜景スコア算出の詳細
                         </p>
-                        <p>
-                            （ここに算出ロジックの詳細が入ります）
-                        </p>
-                        <p className="mt-4 text-xs opacity-60">
-                            Calculation logic version 1.0
-                        </p>
+                        <div className="w-full rounded-xl overflow-hidden shadow-lg mb-2">
+                            <img
+                                src={`${import.meta.env.BASE_URL}plateau_nightview.png`}
+                                alt="Nightview Score"
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
                     </div>
 
                     <div className="pt-4 w-full">
