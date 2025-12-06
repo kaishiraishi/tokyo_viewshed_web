@@ -38,7 +38,6 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
     const marker = useRef<maplibregl.Marker | null>(null);
     const clickMarker = useRef<maplibregl.Marker | null>(null);
     const [isMapLoaded, setIsMapLoaded] = useState(false);
-    const [clickedCoord, setClickedCoord] = useState<{ lng: number; lat: number } | null>(null);
 
     // レイヤーを追加する関数
     const addLayers = () => {
@@ -165,9 +164,6 @@ export default function MapView({ selectedViewpoints, layerOpacity, center, head
         // クリックイベント: ピンを立てて座標を保存
         map.current.on('click', (e) => {
             const { lng, lat } = e.lngLat;
-
-            // 座標を state に保存
-            setClickedCoord({ lng, lat });
 
             // GoogleマップのURL
             const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
